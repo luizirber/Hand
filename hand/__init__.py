@@ -1,0 +1,1 @@
+from baserss import BaseFeedGenerator
