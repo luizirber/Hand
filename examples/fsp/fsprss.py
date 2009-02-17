@@ -9,10 +9,8 @@ from hand import BaseFeedGenerator
 
 class FSPFeed(BaseFeedGenerator):
 
-    def __init__(self):
-        BaseFeedGenerator.__init__(self)
-        self.template_file = "template.xml"
-        self.rss_file = "fsp.xml"
+    def __init__(self, config_file):
+        BaseFeedGenerator.__init__(self, config_file)
 
     def generate_data(self):
         br = mechanize.Browser()
@@ -64,5 +62,5 @@ class FSPFeed(BaseFeedGenerator):
         return entries
 
 if __name__ == "__main__":
-    ff = FSPFeed()
+    ff = FSPFeed('config.ini')
     ff.process()

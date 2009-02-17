@@ -8,10 +8,8 @@ from hand import BaseFeedGenerator
 
 class WigglesFeed(BaseFeedGenerator):
 
-    def __init__(self):
-        BaseFeedGenerator.__init__(self)
-        self.template_file = "template.xml"
-        self.rss_file = "wiggles.xml"
+    def __init__(self, config_file):
+        BaseFeedGenerator.__init__(self, config_file)
 
     def generate_data(self):
         data = urllib.urlopen("http://www.mrwiggleslovesyou.com")
@@ -35,5 +33,5 @@ class WigglesFeed(BaseFeedGenerator):
         return reversed(entries)
 
 if __name__ == "__main__":
-    wf = WigglesFeed()
+    wf = WigglesFeed("config.ini")
     wf.process()

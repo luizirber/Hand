@@ -14,10 +14,8 @@ def try_download(url):
 
 class MalvadosFeed(BaseFeedGenerator):
 
-    def __init__(self):
-        BaseFeedGenerator.__init__(self)
-        self.template_file = "template.xml"
-        self.rss_file = "malvados.xml"
+    def __init__(self, config_file):
+        BaseFeedGenerator.__init__(self, config_file)
 
     def generate_description(self, page):
         [script.extract() for script in page.findAll('script')]
@@ -52,5 +50,5 @@ class MalvadosFeed(BaseFeedGenerator):
         return reversed(entries)
 
 if __name__ == "__main__":
-    mf = MalvadosFeed()
+    mf = MalvadosFeed("config.ini")
     mf.process()

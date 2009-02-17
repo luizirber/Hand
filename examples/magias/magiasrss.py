@@ -8,10 +8,8 @@ from hand import BaseFeedGenerator
 
 class MagiasFeed(BaseFeedGenerator):
 
-    def __init__(self):
-        BaseFeedGenerator.__init__(self)
-        self.template_file = "template.xml"
-        self.rss_file = "magias.xml")
+    def __init__(self, config_file):
+        BaseFeedGenerator.__init__(self, config_file)
 
     def generate_data(self):
         quad_link = re.compile("http://www.magiasebarbaridades.com/tiras/.")
@@ -37,5 +35,5 @@ class MagiasFeed(BaseFeedGenerator):
         return reversed(entries)
 
 if __name__ == "__main__":
-    mf = MagiasFeed()
+    mf = MagiasFeed("config.ini")
     mf.process()

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>$title</title>
+    <description>$description</description>
+    <link>$link</link>
+    <atom:link href="$feed_link" rel="self" type="application/rss+xml" />
+    <pubDate>$pubDate</pubDate>
+    <lastBuildDate>$lastBuildDate</lastBuildDate>
