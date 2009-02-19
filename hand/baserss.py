@@ -80,6 +80,7 @@ class BaseFeedGenerator(object):
                 if db[item['guid']] != item:
                     db[item['guid']] = item
                     modified = True
+        db.close()
         return modified
 
     def process(self):
