@@ -5,6 +5,7 @@ from cStringIO import StringIO
 import rfc822
 from ConfigParser import ConfigParser
 from string import Template
+from shove import Shove
 
 class BaseFeedGenerator(object):
 
@@ -66,8 +67,24 @@ class BaseFeedGenerator(object):
     def generate_data(self):
         raise NotImplementedError
 
+    def save_data(self, data):
+        db = Shove(self.conf['data_file'])
+        modified = False
+        for item in data:
+            try:
+                db[item['guid']]
+            except KeyError:
+                db[item['guid']] = item
+                modified = True
+            else:
+                if db[item['guid']] != item:
+                    db[item['guid']] = item
+                    modified = True
+        return modified
+
     def process(self):
         data = self.generate_data()
-        rss_feed = self.build_feed(data)
-        rss_file = open(self.conf['output_file'], 'w+')
-        rss_file.write(str(rss_feed))
+        if self.save_data(data):
+            rss_feed = self.build_feed(data)
+            rss_file = open(self.conf['output_file'], 'w+')
+            rss_file.write(str(rss_feed))
