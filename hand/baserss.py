@@ -3,11 +3,20 @@ from os.path import expanduser
 from datetime import date, timedelta, datetime
 from cStringIO import StringIO
 import rfc822
+from ConfigParser import ConfigParser
+from string import Template
 
 class BaseFeedGenerator(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, config_file=None):
+        #configs = config
+        self.conf = {}
+        if config_file:
+            config = ConfigParser()
+            config.read(config_file)
+
+            for option in config.options('Feed'):
+                self.conf[option] = config.get('Feed', option)
 
     def build_date(self, theTime):
         data = rfc822.parsedate_tz(theTime.strftime("%a, %d %b %Y %H:%M:%S"))
@@ -19,9 +28,21 @@ class BaseFeedGenerator(object):
     def build_feed(self, data):
         feed = StringIO()
         pubDate = self.build_date(datetime(1,1,1).now())
-        template = open(self.template_file, 'r').read()
-        template = template % (pubDate, pubDate)
-        feed.write(template)
+        try:
+            template_data = open(self.conf['template_file'], 'r')
+            template = Template(template_data.read())
+            template_data.close()
+        except:
+            print 'error' #TODO: tratar erro!
+        base = template.substitute(self.conf, pubDate=pubDate, lastBuildDate=pubDate)
+        feed.write(base)
+
+        feed.write('    <skipHours>\n')
+        build_hours = [int(i) for i in self.conf['build_hours'].split(',')]
+        for skip in xrange(0,24):
+            if skip not in build_hours:
+                feed.write('      <hour>%d</hour>\n'% skip)
+        feed.write('    </skipHours>\n')
 
         for entry in data:
             feed.write(
@@ -48,5 +69,5 @@ class BaseFeedGenerator(object):
     def process(self):
         data = self.generate_data()
         rss_feed = self.build_feed(data)
-        rss_file = open(self.rss_file, 'w+')
+        rss_file = open(self.conf['output_file'], 'w+')
         rss_file.write(str(rss_feed))
