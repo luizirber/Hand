@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 from os.path import expanduser
 from datetime import date, timedelta, datetime
-from cStringIO import StringIO
+from StringIO import StringIO
 import rfc822
 from ConfigParser import ConfigParser
 from string import Template
+import codecs
+
 from shove import Shove
+
+today = date(2000,1,1).today()
 
 class BaseFeedGenerator(object):
 
@@ -27,10 +31,10 @@ class BaseFeedGenerator(object):
         return '&lt;img src="%s"&gt;&lt;br /&gt;&lt;br /&gt;' % (link)
 
     def build_feed(self, data):
-        feed = StringIO()
+        feed = StringIO(u'')
         pubDate = self.build_date(datetime(1,1,1).now())
         try:
-            template_data = open(self.conf['template_file'], 'r')
+            template_data = codecs.open(self.conf['template_file'], 'r', 'utf-8')
             template = Template(template_data.read())
             template_data.close()
         except:
@@ -46,18 +50,19 @@ class BaseFeedGenerator(object):
         feed.write('    </skipHours>\n')
 
         for entry in data:
-            feed.write(
-               ("""    <item>\n"""
-                """      <title>%s</title>\n"""
-                """      <link>%s</link>\n"""
-                """      <description>%s</description>\n"""
-                """      <pubDate>%s</pubDate>\n"""
-                """      <guid>%s</guid>\n"""
-                """    </item>\n""") % (entry['title'],
-                                        entry['page_link'],
-                                        entry['description'],
-                                        entry['pubDate'],
-                                        entry['guid']))
+            if data['pubDate'] <= today:
+                feed.write(
+                   ("""    <item>\n"""
+                    """      <title>%s</title>\n"""
+                    """      <link>%s</link>\n"""
+                    """      <description>%s</description>\n"""
+                    """      <pubDate>%s</pubDate>\n"""
+                    """      <guid>%s</guid>\n"""
+                    """    </item>\n""") % (entry['title'],
+                                            entry['page_link'],
+                                            entry['description'],
+                                            self.build_date(entry['pubDate']),
+                                            entry['guid']))
 
         feed.write("""  </channel>\n""")
         feed.write('</rss>\n')
@@ -84,8 +89,8 @@ class BaseFeedGenerator(object):
         return modified
 
     def process(self):
-        data = self.generate_data()
+        data = list(self.generate_data())
         if self.save_data(data):
             rss_feed = self.build_feed(data)
-            rss_file = open(self.conf['output_file'], 'w+')
-            rss_file.write(str(rss_feed))
+            rss_file = codecs.open(self.conf['output_file'], 'w+', 'utf-8')
+            rss_file.write(rss_feed)
