@@ -55,7 +55,7 @@ class FSPFeed(BaseFeedGenerator):
                 entry['page_link'] = BASE + url['href']
                 entry['guid'] = entry['page_link']
                 entry['description'] = self.generate_description(quad_link)
-                entry['pubDate'] = day
+                entry['pubDate'] = self.build_date(day)
 
                 entries.append(entry)
 

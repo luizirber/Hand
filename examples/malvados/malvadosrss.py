@@ -23,7 +23,7 @@ class MalvadosFeed(BaseFeedGenerator):
         for img in imgs:
             img['src'] = 'http://www.malvados.com.br/%s' % img['src']
         root = page.find("table")
-        return root.prettify()
+        return ''.join(["<![CDATA[", root.prettify(), "]]>"])
 
     def generate_data(self):
         data = urllib.urlopen("http://www.malvados.com.br")

@@ -28,7 +28,7 @@ class BaseFeedGenerator(object):
         return rfc822.formatdate(rfc822.mktime_tz(data))
 
     def generate_description(self, link):
-        return '&lt;img src="%s"&gt;&lt;br /&gt;&lt;br /&gt;' % (link)
+        return '<![CDATA[<img src="%s"><br /><br />]]>' % (link)
 
     def build_feed(self, data):
         feed = StringIO(u'')
@@ -90,7 +90,8 @@ class BaseFeedGenerator(object):
 
     def process(self):
         data = list(self.generate_data())
-        if self.save_data(data):
+        #if self.save_data(data):
+        if 1:
             rss_feed = self.build_feed(data)
             rss_file = codecs.open(self.conf['output_file'], 'w+', 'utf-8')
             rss_file.write(rss_feed)
