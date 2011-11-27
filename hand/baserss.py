@@ -6,6 +6,7 @@ import rfc822
 from ConfigParser import ConfigParser
 from string import Template
 import codecs
+import re, htmlentitydefs
 
 from shove import Shove
 
@@ -26,6 +27,34 @@ class BaseFeedGenerator(object):
     def build_date(self, theTime):
         data = rfc822.parsedate_tz(theTime.strftime("%a, %d %b %Y %H:%M:%S"))
         return rfc822.formatdate(rfc822.mktime_tz(data))
+
+    def unescape(self, text):
+        '''Removes HTML or XML character references and entities from a text string.
+
+        from: http://effbot.org/zone/re-sub.htm#unescape-html
+
+        @param text The HTML (or XML) source text.
+        @return The plain text, as a Unicode string, if necessary.'''
+
+        def fixup(m):
+            text = m.group(0)
+            if text[:2] == "&#":
+                # character reference
+                try:
+                    if text[:3] == "&#x":
+                        return unichr(int(text[3:-1], 16))
+                    else:
+                        return unichr(int(text[2:-1]))
+                except ValueError:
+                    pass
+            else:
+                # named entity
+                try:
+                    text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+                except KeyError:
+                    pass
+            return text # leave as is
+        return re.sub("&#?\w+;", fixup, text)
 
     def generate_description(self, link):
         return '<![CDATA[<img src="%s"><br /><br />]]>' % (link)
@@ -50,7 +79,7 @@ class BaseFeedGenerator(object):
         feed.write('    </skipHours>\n')
 
         for entry in data:
-            if data['pubDate'] <= today:
+            if date(*rfc822.parsedate(entry['pubDate'])[:3]) <= today:
                 feed.write(
                    ("""    <item>\n"""
                     """      <title>%s</title>\n"""
@@ -61,7 +90,7 @@ class BaseFeedGenerator(object):
                     """    </item>\n""") % (entry['title'],
                                             entry['page_link'],
                                             entry['description'],
-                                            self.build_date(entry['pubDate']),
+                                            entry['pubDate'],
                                             entry['guid']))
 
         feed.write("""  </channel>\n""")
@@ -90,8 +119,8 @@ class BaseFeedGenerator(object):
 
     def process(self):
         data = list(self.generate_data())
-        #if self.save_data(data):
-        if 1:
+        if self.save_data(data):
+        #if 1:
             rss_feed = self.build_feed(data)
             rss_file = codecs.open(self.conf['output_file'], 'w+', 'utf-8')
             rss_file.write(rss_feed)

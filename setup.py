@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.4'
+version = '0.5'
 
 setup(name='hand',
       version=version,
@@ -16,7 +16,7 @@ setup(name='hand',
       keywords='',
       author="Luiz Irber",
       author_email="luiz.irber@gmail.com",
-      url="http://code.google.com/p/hand/",
+      url="http://github.com/luizirber/hand",
       license="GPLv3",
       packages=find_packages(exclude=['ez_setup', 'examples']),
       include_package_data=True,

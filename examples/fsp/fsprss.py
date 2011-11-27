@@ -23,9 +23,10 @@ class FSPFeed(BaseFeedGenerator):
         br.form["pass"] = ""
         br.submit()
 
-        BASE = "http://www1.folha.uol.com.br/fsp/quadrin/"
-        quadrinho = re.compile(r'f3(\d{2})(\d{2})(\d{4})\d*.htm$')
-        quad_image = re.compile(r'(\w{3,4})(\d{2})(\d{2})((\d{4})|(\d{4})(\d{2}))\.(gif|jpg)$')
+        BASE = "http://www1.folha.uol.com.br"
+        BASE_INDEX = BASE + "/fsp/quadrin/"
+        quadrinho = re.compile(r'/fsp/quadrin/(.*).shtml$')
+        quad_image = re.compile(r'f.i.uol.com.br(.*).(gif|jpg)$')
 
         today = date(2000,1,1).today()
         current = today - timedelta(7)
@@ -37,10 +38,10 @@ class FSPFeed(BaseFeedGenerator):
 
         entries = []
         for day in reversed(week):
-            new_index = ("inde%02i%02i%02i.htm") % (day.day,
-                                                    day.month,
-                                                    day.year)
-            response = br.open(BASE + new_index)
+            new_index = ("index-%04i%02i%02i.shtml") % (day.year,
+                                                        day.month,
+                                                        day.day)
+            response = br.open(BASE_INDEX + new_index)
             page = BeautifulSoup(response.read())
             urls = page.findAll("a", href=quadrinho)
 
@@ -48,10 +49,10 @@ class FSPFeed(BaseFeedGenerator):
                 response = br.open(BASE + url['href'])
                 page = BeautifulSoup(response.read())
                 quad_link_rel = page.find("img", src=quad_image)
-                quad_link = BASE[:-8] + quad_link_rel['src'][3:]
+                quad_link = quad_link_rel['src']
 
                 entry = {}
-                entry['title'] = url.string
+                entry['title'] = self.unescape(url.getText())
                 entry['page_link'] = BASE + url['href']
                 entry['guid'] = entry['page_link']
                 entry['description'] = self.generate_description(quad_link)
