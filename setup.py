@@ -24,5 +24,7 @@ setup(name='hand',
       install_requires=[
           'BeautifulSoup',
           'mechanize',
+          'shove',
+          'sqlalchemy'
       ]
 )

@@ -26,7 +26,7 @@ class FSPFeed(BaseFeedGenerator):
         BASE = "http://www1.folha.uol.com.br"
         BASE_INDEX = BASE + "/fsp/quadrin/"
         quadrinho = re.compile(r'/fsp/quadrin/(.*).shtml$')
-        quad_image = re.compile(r'f.i.uol.com.br(.*).(gif|jpg)$')
+        quad_image = re.compile(r'f.i.uol.com.br(.*).(gif|jpg|jpeg)$')
 
         today = date(2000,1,1).today()
         current = today - timedelta(7)
