@@ -1,7 +1,30 @@
-from setuptools import setup, find_packages
-import sys, os
+#!/usr/bin/env python
+
+from setuptools import setup, find_packages, Command
+
 
 version = '0.5'
+
+install_requires = [
+    'shove'
+]
+
+
+class PyTest(Command):
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import sys
+        import subprocess
+        errno = subprocess.call([sys.executable, 'runtests.py'])
+        raise SystemExit(errno)
+
 
 setup(name='hand',
       version=version,
@@ -21,10 +44,7 @@ setup(name='hand',
       packages=find_packages(exclude=['ez_setup', 'examples']),
       include_package_data=True,
       zip_safe=False,
-      install_requires=[
-          'BeautifulSoup',
-          'mechanize',
-          'shove',
-          'sqlalchemy'
-      ]
-)
+      install_requires=install_requires,
+      cmdclass={'test': PyTest},
+      platforms='any',
+      )
