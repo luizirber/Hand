@@ -1,5 +1,5 @@
 shove
-pip==1.4
+pip==21.1
 setuptools==0.9
 wheel==0.21
 pytest-cov==1.6
